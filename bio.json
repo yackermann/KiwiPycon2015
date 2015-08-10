@@ -1,0 +1,14 @@
+{
+    "github"     : "@herrniemand",
+    "keybase"    : "@niemand",
+    "fromRussia" : true,
+    "pLanguages" : ["python", "js", "php", "brainfuck"],
+    "languages"  : ["ru-ru", "en-nz", "de-de"],
+    "poetry"     : ["symbolism", "romanism", "cubism", "ametism"],
+    "drinking"   : {
+        "tea"    : true,
+        "coffee" : false,
+        "beer"   : true,
+        "vodka"  : !!("You kidding me?")
+    }
+}
