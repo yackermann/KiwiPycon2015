@@ -11,9 +11,13 @@ headers = {
 
 req  = urllib.request.Request(url, headers=headers) # GET
 
+def cleanMe( content ):
+    regex = re.compile(r'[\n|\t|\r]')
+    return regex.sub('', content)
+
 def cook( content ):
     soup = BeautifulSoup(content, 'html.parser')
-    print(soup.find_all('div', { 'class' : "game_purchase_price price"})[0].text)
+    print(cleanMe(soup.find_all('div', { 'class' : "game_purchase_price price"})[0].text))
 
 try:
     resp = urllib.request.urlopen(req)
