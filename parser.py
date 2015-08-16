@@ -1,32 +1,26 @@
+import re
 import urllib.request
 import urllib.parse
+from bs4 import BeautifulSoup
 
-# x = urllib.request.urlopen('https://google.com/')
-# print(x.read())
-
-# https://www.google.com/search?q=Monthy+Python
-
-url = 'https://google.com/search'
-get = {
-    'q' : 'Monthy Python'
-}
+url = 'http://store.steampowered.com/app/220'
 
 headers = {
     'User-Agent' : 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/43.0.2357.130 Chrome/43.0.2357.130 Safari/537.36'
 }
 
+req  = urllib.request.Request(url, headers=headers) # GET
 
-data = urllib.parse.urlencode(get) # Encodes to url format
-data = data.encode('utf-8') # Converts to binary utf-8
-
-# req  = urllib.request.Request(url, data) # POST
-req  = urllib.request.Request(url + '?' + data.decode("utf-8"), headers=headers) # GET
+def cook( content ):
+    soup = BeautifulSoup(content, 'html.parser')
+    print(soup.find_all('div', { 'class' : "game_purchase_price price"})[0].text)
 
 try:
     resp = urllib.request.urlopen(req)
-    print(resp.read())
+
+    cook(resp.read().decode('utf-8'))
+    print('Done')
 
 except Exception as e:
-    print(str(e)) # 403 forbidden???
-                  # Google thinks that you are a robot...
-                  # ...because you do not have anything in HEADERS
+    print(str(e))
+
