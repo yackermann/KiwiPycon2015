@@ -26,13 +26,17 @@ game = {}
 #     }
 # }
 
-def cleanMe( content ):
-    regex = re.compile(r'[\n|\t|\r]')
+def clean( content, form ):
+    expressions = {
+        'tabs' : r'[\n|\t|\r]',
+        'numbers' : r'[^0-9\.]'
+    }
+    regex = re.compile(expressions[form])
     return regex.sub('', content)
 
 def cook( content ):
     soup = BeautifulSoup(content, 'html.parser')
-    print(cleanMe(soup.find_all('div', { 'class' : "game_purchase_price price"})[0].text))
+    print(clean(soup.find_all('div', { 'class' : "game_purchase_price price"})[0].text, 'numbers'))
 
 try:
     resp = urllib.request.urlopen(req)
