@@ -11,6 +11,21 @@ headers = {
 
 req  = urllib.request.Request(url, headers=headers) # GET
 
+game = {}
+
+# game = {
+#     'name'        : '',
+#     'price'       : 0,
+#     'tags'        : [],
+#     'genre'       : '',
+#     'publisher'   : '',
+#     'releaseDate' : '',
+#     'rating'      : {
+#         'count' : 0,
+#         'total' : 0
+#     }
+# }
+
 def cleanMe( content ):
     regex = re.compile(r'[\n|\t|\r]')
     return regex.sub('', content)
