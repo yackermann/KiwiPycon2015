@@ -26,6 +26,8 @@ game = {}
 #     }
 # }
 
+soup = ''
+
 def clean( content, form ):
     expressions = {
         'tabs' : r'[\n|\t|\r]',
@@ -35,8 +37,22 @@ def clean( content, form ):
     return regex.sub('', content)
 
 def cook( content ):
+    global soup
     soup = BeautifulSoup(content, 'html.parser')
-    print(clean(soup.find_all('div', { 'class' : "game_purchase_price price"})[0].text, 'numbers'))
+    game = {
+        'name'        : clean(soup.find_all('div', { 'class' : 'apphub_AppName' })[0].text, 'tabs'),
+        'price'       : clean(soup.find_all('div', { 'class' : "game_purchase_price price"})[0].text, 'numbers'),
+        'tags'        : [ clean(tag.text, 'tabs') for tag in soup.find_all('a', {'class' : 'app_tag'}) ],
+        'genre'       : '',
+        'publisher'   : '',
+        'releaseDate' : '',
+        'rating'      : {
+            'count' : 0,
+            'total' : 0
+        }
+    }
+
+    print(game)
 
 try:
     resp = urllib.request.urlopen(req)
