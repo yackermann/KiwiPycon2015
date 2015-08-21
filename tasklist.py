@@ -19,12 +19,9 @@ class Task:
 
     def json(self):
         return json.dumps({
-            'id' : self.id,
-            'range': {
-                'start' : self.r.start,
-                'stop'  : self.r.stop,
-                'step'  : self.r.step
-            }
+            'start' : self.r.start,
+            'stop'  : self.r.stop,
+            'step'  : self.r.step
         })
 
 class TaskList:

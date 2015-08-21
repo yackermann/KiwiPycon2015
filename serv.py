@@ -24,7 +24,7 @@ class HttpProcessor(BaseHTTPRequestHandler):
 
         ip = self.client_address[0]
 
-        if self.path == '/update':
+        if self.path == '/server':
 
             form = cgi.FieldStorage(
                 fp=self.rfile, 
@@ -67,7 +67,7 @@ class HttpProcessor(BaseHTTPRequestHandler):
 
 was = 0
 step = 10
-for i in range(2500, 1000000, 2500):
+for i in range(2500, 10000, 2500):
     id = str(was) + '-' + str(i)
     man.addTask(id, range(was, i, step))
     was = i
