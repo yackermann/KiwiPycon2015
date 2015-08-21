@@ -2,8 +2,9 @@ import json
 from datetime import datetime as time
 class Task:
     def __init__(self, id, r):
-        self.r  = r
-        self.id = id
+        self.r    = r
+        self.id   = id
+        self.data = ''
 
     def addData(self, data):
         self.data = data
@@ -39,12 +40,18 @@ class TaskList:
             task.setTimestamp()
             self.running[ip] = task
             return task.json()
+
         elif ip in self.running:
             return self.running[ip].json()
+
+        else:
+            return '{}'
 
     def getJSON(self, ip):
         if ip in self.running:
             return self.running[ip].json()
+        else:
+            return '{}'
 
     def updateStatus(self, ip):
         if ip in self.running:
@@ -53,12 +60,31 @@ class TaskList:
     def failTask(self, ip):
         if ip in self.running:
             task = self.running[ip]
-            del self.running[ip]
             self.new.append(task)
+            del self.running[ip]
+
+    def exportData(self):
+        data = []
+        filename = 'games.' + str(time.now()) + '.json'
+        
+        for res in self.complete:
+            for game in res.getData():
+                data.append(game)
+
+
+        with open(filename, 'w') as w:
+            w.write(json.dumps(data, indent=4, separators=(',', ': ')))
+
+        print('Exported data to:', filename)
+
 
     def completeTask(self, ip, data):
         if ip in self.running:
+            
             task = self.running[ip]
             task.addData(data)
-            del self.running[ip]
             self.complete.append(task)
+            del self.running[ip]
+
+            if len(self.new) == 0 and len(self.running) == 0:
+                self.exportData()
