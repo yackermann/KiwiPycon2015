@@ -13,23 +13,33 @@ def cook( content ):
     soup = BeautifulSoup(content, 'html.parser')
     title = soup.find('title').text
     if title != 'Site Error':
-        def sortMixedVariable():
-            mixed = soup.find_all('div', { 'class' : 'details_block' })[0].text.replace('\n\n', '\n').replace(':\n', ':').split('\n')
-            toArray = [ item.split(':') for item in mixed if item != '' ]
-            metaInfo = {}
-            for item in toArray:
-                metaInfo[ item[0].replace(' ', '').lower() ] = item[1]
-            return metaInfo
+        # def sortMixedVariable():
+        #     mixed = soup.find_all('div', { 'class' : 'details_block' })[0].text.replace('\n\n', '\n').replace(':\n', ':').split('\n')
+        #     toArray = [ item.split(':') for item in mixed if item != '' ]
+        #     metaInfo = {}
+        #     for item in toArray:
+        #         metaInfo[ item[0].replace(' ', '').lower() ] = item[1]
+        #     return metaInfo
 
-        mixed = sortMixedVariable()
+        # mixed = ''
 
+        # try:
+        #     mixed = sortMixedVariable()
+        # except:
+        #     mixed = {
+        #         'genre'       : '',
+        #         'publisher'   : '',
+        #         'releasedate' : ''
+        #     }
+
+        print(mixed)
         game = {
             'name'        : clean(soup.find_all('div', { 'class' : 'apphub_AppName' })[0].text, 'tabs'),
             'price'       : float(clean(soup.find_all('div', { 'class' : "game_purchase_price price"})[0].text, 'numbers')),
             'tags'        : [ clean(tag.text, 'tabs') for tag in soup.find_all('a', {'class' : 'app_tag'}) ],
-            'genre'       : mixed['genre'],
-            'publisher'   : mixed['publisher'],
-            'releasedate' : mixed['releasedate'],
+            # 'genre'       : mixed['genre'],
+            # 'publisher'   : mixed['publisher'],
+            # 'releasedate' : mixed['releasedate'],
             'rating'      : {
                 'count' : float(clean(soup.find_all(attrs={ 'itemprop' : 'reviewCount'})[0]['content'], 'numbers')),
                 'total' : int(clean(soup.find_all(attrs={ 'itemprop' : 'ratingValue'})[0]['content'], 'numbers'))
