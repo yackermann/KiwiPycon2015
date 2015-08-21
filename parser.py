@@ -13,19 +13,6 @@ req  = urllib.request.Request(url, headers=headers) # GET
 
 game = {}
 
-# game = {
-#     'name'        : '',
-#     'price'       : 0,
-#     'tags'        : [],
-#     'genre'       : '',
-#     'publisher'   : '',
-#     'releaseDate' : '',
-#     'rating'      : {
-#         'count' : 0,
-#         'total' : 0
-#     }
-# }
-
 soup = ''
 
 def clean( content, form ):
@@ -45,7 +32,7 @@ def cook( content ):
         toArray = [ item.split(':') for item in mixed if item != '' ]
         metaInfo = {}
         for item in toArray:
-            metaInfo[item[0].replace(' ', '').lower()] = item[1]
+            metaInfo[ item[0].replace(' ', '').lower() ] = item[1]
         return metaInfo
 
     mixed = sortMixedVariable()
