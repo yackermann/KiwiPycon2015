@@ -79,5 +79,5 @@ man.addTask('test', range(6330, 6400, 10))
 
 print('Starting server...')
 
-serv = HTTPServer( ( 'localhost' , 8888 ) , HttpProcessor )
+serv = HTTPServer( ( '0.0.0.0' , 8888 ) , HttpProcessor )
 serv.serve_forever()
