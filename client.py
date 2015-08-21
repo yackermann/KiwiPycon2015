@@ -35,18 +35,26 @@ def post(url, values):
         }
 
 def bruteforceRange(r):
-    items = []
+    games = []
+
     for id in r:
         url = url = 'http://store.steampowered.com/app/' + str(id)
-
+        tries = 0
         while True:
+            # 3 tries
+            tries = tries + 1
+            if tries > 3:
+                print('Failed:', 3)
+                break
+
             data = get(url)
             if(data['ok']):
                 if data['url'] == url:
-                    item = cook(data['data'])
+                    item = prepare(data['data'])
                     if item['ok']:
                         print('Parsing:', url)
-                        items.push(item)
+                        item['data']['appid'] = id
+                        games.append(item['data'])
                     else:
                         print('Skipping:', url)
                 else:
@@ -58,21 +66,34 @@ def bruteforceRange(r):
 
             sleep(0.33)
 
-    return items
+    return games
 
 
 def StartClient():
     print('Starting client...')
     while True:
-        task = get(mothership['get'])
+        task = ''
+        try:
+            task = get(mothership['get'])
+        except:
+            print('Server is down')
+            sleep(1)
+            continue
+
         if task['ok']:
             todo = json.loads(task['data'])
-            r = range(todo['start'], todo['stop'], todo['step'])
-            data = bruteforceRange(r)
-            post(mothership['post'], json.dumps(data))
+            if 'start' in todo and 'stop' in todo and 'step' in todo:
+                print('Received task:', todo['start'], 'to', todo['stop'], 'step', todo['step'] )
+                r = range(todo['start'], todo['stop'], todo['step'])
+                # r = range(7300, 7500, 10)
+                data = bruteforceRange(r)
+                post(mothership['post'], {'method': 'data', 'data' : json.dumps(data)})
+            else:
+                print('Not task')
+                sleep(1)
         else:
-            print('Failed', task)
-        sleep(0.5)
+            print('Failed to receive task')
+        sleep(1)
 
-
+StartClient()
 # url = 'http://store.steampowered.com/app/220'

@@ -8,6 +8,11 @@ class Task:
 
     def addData(self, data):
         self.data = data
+        self.cache()
+
+    def cache(self):
+        with open('cache/' + str(self.id) + '.json', 'w') as cache:
+            cache.write(json.dumps(self.data, indent=4, separators=(',', ': ')))
 
     def getData(self):
         return self.data

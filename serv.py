@@ -3,6 +3,7 @@ from tasklist import *
 import re, cgi
 
 man = TaskList()
+x = ''
 post = ''
 class HttpProcessor(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -13,6 +14,7 @@ class HttpProcessor(BaseHTTPRequestHandler):
         ip = self.client_address[0]
 
         if(self.path == '/get'):
+            print('Getting task for:', ip)
             self.wfile.write(man.getTask(ip).encode('utf-8'))
         else:
             self.wfile.write('{}'.encode('utf-8'))
@@ -24,7 +26,7 @@ class HttpProcessor(BaseHTTPRequestHandler):
 
         ip = self.client_address[0]
 
-        if self.path == '/server':
+        if self.path == '/post':
 
             form = cgi.FieldStorage(
                 fp=self.rfile, 
@@ -46,14 +48,15 @@ class HttpProcessor(BaseHTTPRequestHandler):
                             d = json.loads(data)
                             man.completeTask(ip, d)
                             print('Success data')
-                        except:
+                        except Exception as e:
+                            print(e)
                             man.failTask(ip)
                             print('Failed data')
                     else:
                         print('No data')
 
                 else:
-                     self.wfile.write('{"status" : 404}'.encode('utf-8'))
+                     self.wfile.write('{}'.encode('utf-8'))
 
 
 
@@ -67,10 +70,12 @@ class HttpProcessor(BaseHTTPRequestHandler):
 
 was = 0
 step = 10
-for i in range(2500, 10000, 2500):
+for i in range(2500, 1000000, 2500):
     id = str(was) + '-' + str(i)
     man.addTask(id, range(was, i, step))
     was = i
+
+man.addTask('test', range(6330, 6400, 10))
 
 print('Starting server...')
 
