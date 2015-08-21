@@ -13,14 +13,14 @@ def get(url):
     try:
         req = urllib.request.Request(url, headers=headers)
 
-        with urllib.request.urlopen(req) as response:
+        with urllib.request.urlopen(req, timeout=2) as response:
             return {
-                'ok' : True,
-                'url': response.url,
+                'ok'  : True,
+                'url' : response.url,
                 'data': response.read().decode('utf-8')
             }
-    except:
-        return {'ok' : False }
+    except Exception as e:
+        return {'ok' : False, 'error': e }
 
 def post(url, values):
     data = urllib.parse.urlencode(values)
@@ -38,18 +38,25 @@ def bruteforceRange(r):
     items = []
     for id in r:
         url = url = 'http://store.steampowered.com/app/' + str(id)
-        data = get(url)
-        if data['url'] == url:
-            item = cook(data['data'])
-            if item['ok']:
-                print('Parsing:', url)
-                items.push(item)
-            else:
-                print('Skipping:', url)
 
-        else:
-            print('Skipping:', url)
-        sleep(0.33)
+        while True:
+            data = get(url)
+            if(data['ok']):
+                if data['url'] == url:
+                    item = cook(data['data'])
+                    if item['ok']:
+                        print('Parsing:', url)
+                        items.push(item)
+                    else:
+                        print('Skipping:', url)
+                else:
+                    print('Skipping:', url)
+            
+                break
+            else:
+                print('Redoing:', url)
+
+            sleep(0.33)
 
     return items
 
@@ -57,10 +64,15 @@ def bruteforceRange(r):
 def StartClient():
     print('Starting client...')
     while True:
-        task = json.loads(get(mothership['get'])['data'])
-        r = range(task['start'], task['stop'], task['step'])
-        data = bruteforceRange(r)
-        post(mothership['post'], json.dumps(data))
+        task = get(mothership['get'])
+        if task['ok']:
+            todo = json.loads(task['data'])
+            r = range(todo['start'], todo['stop'], todo['step'])
+            data = bruteforceRange(r)
+            post(mothership['post'], json.dumps(data))
+        else:
+            print('Failed', task)
+        sleep(0.5)
 
 
 # url = 'http://store.steampowered.com/app/220'
