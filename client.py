@@ -3,8 +3,8 @@ from parser import *
 from time import sleep
 
 mothership = {
-    'get' : 'http://localhost:8888/get',
-    'post' : 'http://localhost:8888/post'
+    'get' : 'http://192.241.194.12:8888/get',
+    'post' : 'http://192.241.194.12:8888/post'
 }
 
 headers = {'User-Agent' : 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/43.0.2357.130 Chrome/43.0.2357.130 Safari/537.36'}
@@ -23,16 +23,19 @@ def get(url):
         return {'ok' : False, 'error': e }
 
 def post(url, values):
-    data = urllib.parse.urlencode(values)
-    data = data.encode('utf-8')
+    try:
+        data = urllib.parse.urlencode(values)
+        data = data.encode('utf-8')
 
-    req = urllib.request.Request(url, data, headers=headers)
+        req = urllib.request.Request(url, data, headers=headers)
 
-    with urllib.request.urlopen(req) as response:
-        return {
-            'url': response.url,
-            'data': response.read().decode('utf-8')
-        }
+        with urllib.request.urlopen(req) as response:
+            return {
+                'url': response.url,
+                'data': response.read().decode('utf-8')
+            }
+    except Exception as e:
+        return {'ok' : False, 'error': e }
 
 def bruteforceRange(r):
     games = []
