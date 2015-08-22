@@ -9,6 +9,6 @@
         "tea"    : true,
         "coffee" : false,
         "beer"   : true,
-        "vodka"  : !!("You kidding me?")
+        "vodka"  : true
     }
 }
