@@ -45,6 +45,17 @@ def cook( data ):
             return toInt(clean(d, 'numbers'))
         return 0
 
+    def currency( d ):
+        if d != None:
+            d = d.text
+            if 'Free to Play' in d:
+                return ''
+            elif d == '':
+                return ''
+                
+            return lax(re.findall(r'[A-Za-z]*[$¢£¤¥֏؋৲৳৻૱௹฿៛€]', d), 0)
+        return ''
+
     def rating( d ):
         for var in d:
             if d[var] != None:
@@ -54,10 +65,11 @@ def cook( data ):
         return d
 
     return {
-        'name'   : name(data['name']),
-        'price'  : price(data['price']),
-        'tags'   : data['tags'],
-        'rating' : rating(data['rating'])
+        'name'     : name(data['name']),
+        'price'    : price(data['price']),
+        'currency' : currency(data['price']),
+        'tags'     : data['tags'],
+        'rating'   : rating(data['rating'])
     }
 
 
