@@ -75,8 +75,6 @@ for i in range(2500, 1000000, 2500):
     man.addTask(id, range(was, i, step))
     was = i
 
-man.addTask('test', range(6330, 6400, 10))
-
 print('Starting server...')
 
 serv = HTTPServer( ( '0.0.0.0' , 8888 ) , HttpProcessor )
