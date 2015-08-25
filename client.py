@@ -67,7 +67,7 @@ def bruteforceRange(r):
             else:
                 print('Redoing:', url)
 
-            sleep(0.33)
+            sleep(0.1)
 
     return games
 
