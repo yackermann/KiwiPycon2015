@@ -12,12 +12,7 @@ def clean( content, form ):
     }
     regex = re.compile(expressions[form])
     return regex.sub('', content)
-# List access exceptioner 
-def lax(l, index):
-    try:
-        return l[index]
-    except: 
-        return None
+
 def toInt( num ):
     try:
         return int(num)
@@ -78,43 +73,23 @@ def prepare( content ):
     title = soup.find('title').text
     if title != 'Site Error':
         game = {}
-        # def sortMixedVariable():
-        #     mixed = soup.find_all('div', { 'class' : 'details_block' })[0].text.replace('\n\n', '\n').replace(':\n', ':').split('\n')
-        #     toArray = [ item.split(':') for item in mixed if item != '' ]
-        #     metaInfo = {}
-        #     for item in toArray:
-        #         metaInfo[ item[0].replace(' ', '').lower() ] = item[1]
-        #     return metaInfo
 
-        # mixed = ''
-
-        # try:
-        #     mixed = sortMixedVariable()
-        # except:
-        #     mixed = {
-        #         'genre'       : '',
-        #         'publisher'   : '',
-        #         'releasedate' : ''
-        #     }
-
-        # print(mixed)
         try:
             game = {
-                'name'        : lax(soup.find_all('div', { 'class' : 'apphub_AppName' }), 0),
-                'price'       : lax(soup.find_all('div', { 'class' : 'game_purchase_price price' }), 0),
+                'name'        : soup.find('div', { 'class' : 'apphub_AppName' }),
+                'price'       : soup.find('div', { 'class' : 'game_purchase_price price' }),
                 'tags'        : [ clean(tag.text, 'tabs') for tag in soup.find_all('a', {'class' : 'app_tag'}) ],
-                # 'genre'       : mixed['genre'],
-                # 'publisher'   : mixed['publisher'],
-                # 'releasedate' : mixed['releasedate'],
                 'rating'      : {
-                    'count' : lax(soup.find_all(attrs={ 'itemprop' : 'reviewCount'}), 0),
-                    'total' : lax(soup.find_all(attrs={ 'itemprop' : 'ratingValue'}), 0)
+                    'count' : soup.find(attrs={ 'itemprop' : 'reviewCount'}),
+                    'total' : soup.find(attrs={ 'itemprop' : 'ratingValue'})
                 }
             }
         except Exception as e:
             print(json.dumps({
                 'Error': str(e)
             }, indent=4, separators=(',', ': ')))
+
+            return {'ok': False}
 
         export = cook(game)
 
