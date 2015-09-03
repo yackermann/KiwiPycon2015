@@ -31,6 +31,7 @@ class: center, middle, inverse
 ]
 # API Limitations
 ## Low request quota, high prices, bad API.
+### Hello to wikipedia, and thanks for HTML content! Really useful!
 ---
 .right-section[
 ### Reasons
@@ -523,7 +524,13 @@ $ python3 practice.py
 ```
 
 ---
+# This section was proudly sponsored by *Irish music*...
 
+<iframe width="100%" height="50%" src="https://www.youtube.com/embed/qGyPuey-1Jw?list=RDMZ35SOU9HTM" frameborder="0" allowfullscreen></iframe>
+
+# Irish music, *Bímis ar meisce, agus ríomhchláraithe*
+
+---
 # Stripping
 
 ---
@@ -535,7 +542,6 @@ $ python3 practice.py
 # ...or Scraping
 
 ---
-
 .right-section[
 ### \#2 Stripping
 ]
@@ -1463,15 +1469,6 @@ def get(url):
         return { 'ok': False, 'error': str(e)}
 ```
 
-
----
-class: left
-.right-section[
-### \#2 Stripping
-]
-
-
-
 ---
 class: left
 .right-section[
@@ -1902,9 +1899,35 @@ def get(url):
 if response['ok'] and response['URLMatch']:
     print(cook(prepare(response['data'])))
 ```
+---
+class: left
+
+## Right now we can simply make *for-loop* and parse all of the steam games.
 
 ---
-# Your thought right now
+class: left
+
+# But the problems with this are:
+## Lots of requests. e.g. 100k to bruteforce steam.
+
+---
+class: left
+
+# But the problems with this are:
+## Lots of requests. e.g. 100k to bruteforce steam.
+## Long time. If request and parsing takes 250ms, we will need around 7 hours to do that.
+
+---
+class: left
+
+# But the problems with this are:
+## Lots of requests. e.g. 100k to bruteforce steam.
+## Long time. If request and parsing takes 250ms, we will need around 7 hours to do that.
+## Requests from one ip. Admins can check logs, and as a response provide ban, or 100gb porn archive for your ip address.
+
+---
+
+# Your thoughts right now
 
 ![Where is the pizza?](images/where.is.the.pizza.gif)
 
@@ -1914,6 +1937,849 @@ if response['ok'] and response['URLMatch']:
 
 ---
 
+# Prize challenge!
+
+![Challenge](images/challenge.gif)
+
+# MUST BE DONE BY END OF \#3 Parallelize
+---
+# This section was proudly sponsored by *German folk music*
+
+<iframe width="100%" height="50%" src="https://www.youtube.com/embed/8bzziAv9o4w" frameborder="0" allowfullscreen></iframe>
+
+# German music, what a great tool to keep people away from you!
+
+### Yes, I know the songs are about Austria
+---
 # ~~\#3 Paralelise~~
 # ~~\#3 Parallelise~~
 # \#3 Parallelize
+
+---
+class: left
+.right-section[
+### \#3 Parallelize
+]
+
+## The algorithm:
+## We have Server and Client
+## Client gets task using GET request to `/get`, Server assigns task to ip and send *task*
+## Client does task, and POST data to `/post` Server. Server saves result, and finishes task.
+
+---
+.right-section[
+### \#3 Parallelize
+]
+
+# Server && Client
+
+---
+class: left
+.right-section[
+### \#3 Parallelize
+]
+
+## Lets separate our code. 
+## `parcer.py` - Anything to do with parsing
+## `client.py` - Anything to do with client side
+## `server.py` - Anything to do with server side
+
+---
+class: left
+.right-section[
+### \#3 Parallelize
+]
+
+## So lets rename `practice.py` to `parser.py`, and move `get()` to `client.py`
+```python
+#client.py
+import urllib.request as request
+import urllib.parse   as parse
+from parser import *
+
+def get(url):
+    try:
+        headers = {
+          'User-Agent' : 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/44.0.2403.89 Chrome/44.0.2403.89 Safari/537.36'
+        }
+
+        req = request.Request(url, headers=headers)
+        resp = request.urlopen(req, timeout=2)
+        
+        return { 
+            'ok': True,
+            'URLMatch': url == resp.url,
+            'data': resp.read().decode('utf-8')
+        }
+    except Exception as e:
+        return { 'ok': False, 'error': str(e)}
+```
+
+---
+.right-section[
+### \#3 Parallelize
+]
+
+# Server
+
+---
+class: left
+.right-section[
+### \#3 Parallelize
+]
+
+## For server we will user standard python library `http.server`
+## Specifically two classes
+## `BaseHTTPRequestHandler` and `HTTPServer`
+
+---
+
+class: left
+.right-section[
+### \#3 Parallelize
+]
+
+## *BaseHTTPRequestHandler* does request processing that given by *HTTPServer*.
+## Lets make simple HTTP server
+```python
+from http.server import BaseHTTPRequestHandler, HTTPServer
+
+address = ( '0.0.0.0', 8888 )
+
+server = HTTPServer(address, BaseHTTPRequestHandler)
+
+print('Staring server at', address[0], 'port', address[1])
+
+server.serve_forever()
+```
+
+```shell
+$ python3 server.py 
+Staring server at 0.0.0.0 port 8888
+```
+
+---
+class: left
+.right-section[
+### \#3 Parallelize
+]
+
+## Now open [http://localhost:8888](http://localhost:8888)
+
+## You should get:
+```HTML
+Error response
+
+Error code: 501
+
+Message: Unsupported method ('GET').
+
+Error code explanation: 501 - Server does not support this operation.
+```
+
+## And console should have something like this
+```shell
+$ python server.py 
+Staring server at 0.0.0.0 port 8888
+127.0.0.1 - - [01/Sep/2015 20:39:11] code 501, message Unsupported method ('GET')
+127.0.0.1 - - [01/Sep/2015 20:39:11] "GET / HTTP/1.1" 501 -
+...
+```
+
+---
+class: left
+.right-section[
+### \#3 Parallelize
+]
+
+## Currently we are getting error on GET request, this is because GET request is not implemented, so we have to take care of that by expanding *BaseHTTPRequestHandler* class.
+
+## Lets extend *BaseHTTPRequestHandler* class with *HTTPProcessor* class
+
+```python
+class HTTPProcessor(BaseHTTPRequestHandler):
+    pass
+```
+
+---
+class: left
+.right-section[
+### \#3 Parallelize
+]
+
+## To handle GET request we need add to *HTTPProcessor* `do_GET()` function
+```python
+class HTTPProcessor(BaseHTTPRequestHandler):
+    def do_GET(self):
+        print('Getting get request from', self.client_address)
+
+```
+
+## And lets change current processor to new one
+```python
+#server = HTTPServer(address, BaseHTTPRequestHandler)
+server = HTTPServer(address, HTTPProcessor)
+```
+
+## Lets test it out again
+```shell
+$ python3 server.py 
+Staring server at 0.0.0.0 port 8888
+Getting get request from ('127.0.0.1', 54461)
+Getting get request from ('127.0.0.1', 54462)
+...
+```
+
+---
+class: left
+.right-section[
+### \#3 Parallelize
+]
+
+## Currently we can see how client sending us requests, but we are not replying back. 
+## When client sends us request, we need to provide some information with our response, such as 
+## *status code*, so client knows if we are OK.
+## *content-type header*, so client knows what type information it is.
+```python
+class HTTPProcessor(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header('content-type','text/plain')
+        self.end_headers()
+
+        print('Getting get request from', self.client_address)
+```
+
+---
+class: left
+.right-section[
+### \#3 Parallelize
+]
+
+## Now we can send client some data
+```python
+class HTTPProcessor(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header('content-type','text/plain')
+        self.end_headers()
+
+        self.wfile.write('Hello World!'.encode('utf-8'))
+
+        print('Getting get request from', self.client_address)
+```
+# UTF-8 EVERYTHING YOU MUST!
+
+## You should get something like this
+![Response example](images/resp.simple.example.png)
+
+---
+class: left
+.right-section[
+### \#3 Parallelize
+]
+
+## Parsing Steam is a big job. 
+## Since steam library is over 8000 game and around 20000 DLCs, it is reasonable to brute-force up to 1000000. 
+## So it will take us 100000 request.(Because appIDs ALWAYS finish with 0, so it is step 10)
+## Lets say we make 4 requests per second that still will be ~7 hours of brute-forcing. 
+## So we need to split the task on to small chunks, and do them parallel on multiple VMs.
+
+---
+class: left
+.right-section[
+### \#3 Parallelize
+]
+
+# Task List
+
+---
+class: left
+.right-section[
+### \#3 Parallelize
+]
+
+## For parsing Steam we will need very simple task manager...
+
+---
+class: left
+.right-section[
+### \#3 Parallelize
+]
+
+## And because writing task list is the most possibly boring thing to do, please download it from here:
+
+[https://raw.githubusercontent.com/herrniemand/KiwiPycon2015/master/tasklist.py](https://raw.githubusercontent.com/herrniemand/KiwiPycon2015/master/tasklist.py)
+
+---
+class: left
+.right-section[
+### \#3 Parallelize
+]
+
+```shell
+class TaskList(builtins.object)
+ |  TaskList Class
+ |  
+ |  Methods defined here:
+ |  
+ |  __init__(self)
+ |  
+ |  addTask(self, id, r)
+ |      Adds new Task to TaskList
+ |  
+ |  completeTask(self, ip, data)
+ |      Completes task specified by ip address
+ |  
+ |  exportData(self)
+ |      Exports all data to JSON file
+ |  
+ |  failTask(self, ip)
+ |      Fails Task, specified by ip address
+ |  
+ |  getJSON(self, ip)
+ |      Return JSON encoded Task, specified by ip address
+ |  
+ |  getTask(self, ip)
+ |      Returns Task from TaskList, specified by ip address
+ |  
+ |  updateStatus(self, ip)
+ |      Updates Task timestamp, specified by ip address
+```
+
+---
+class: left
+.right-section[
+### \#3 Parallelize
+]
+
+## For the start lets import *Task List*.
+```python
+...
+from tasklist import *
+...
+manager = TaskList()
+```
+
+## Lets add test task
+```python
+manager.addTask('test', range(0, 100, 10))
+```
+
+---
+class: left
+.right-section[
+### \#3 Parallelize
+]
+## When client does GET request, we want to give him task. So first we need to find clients ip address.
+```python
+class HttpProcessor(BaseHTTPRequestHandler):
+    def do_GET(self):
+        ...
+        ip = self.client_address[0]
+        ...
+```
+
+---
+class: left
+.right-section[
+### \#3 Parallelize
+]
+## Now lets get the task, and send it to client.
+```python
+class HttpProcessor(BaseHTTPRequestHandler):
+    def do_GET(self):
+        ...
+        ip = self.client_address[0]
+        ...
+        task = manager.getTask(ip)
+        self.wfile.write(task.encode('utf-8'))
+```
+
+## Now in the browser you should see JSON return
+```javascript
+{"stop": 100, "start": 0, "step": 10}
+```
+
+---
+class: left
+.right-section[
+### \#3 Parallelize
+]
+
+## Currently our *content-type* header set to *text/plain*, but we are returning JSON. Lets fix that.
+```python
+        ...
+        self.send_header('content-type','application/json')
+        ...
+```
+
+---
+class: left
+.right-section[
+### \#3 Parallelize
+]
+
+## Back to `client.py`.
+
+## Lets retrieve task from server
+```python
+...
+response = get('http://localhost:8888/')
+print(response)
+```
+
+## If your server is up
+```shell
+$ python3 client.py
+{'ok': True, 'URLMatch': True, 'data': '{"step": 10, "start": 0, "stop": 100}'}
+```
+
+## If it is down
+```shell
+$ python3 client.py
+{'error': '<urlopen error [Errno 111] Connection refused>', 'ok': False}
+```
+
+---
+class: left
+.right-section[
+### \#3 Parallelize
+]
+
+## If request was successful, then we need to parse JSON from response
+```python
+import json
+...
+response = get('http://localhost:8888/')
+if response['ok']:
+    task = json.loads(response['data'])
+```
+
+## The task if simple *range*. It has *start*, *stop*, and *step*. Before we do anything, we need to make sure all of them are exist, and if they are okay, then we can generate *range* instance.
+```python
+response = get('http://localhost:8888/')
+if response['ok']:
+    task = json.loads(response['data'])
+    if 'start' in task and 'stop' in task and 'step' in task:
+        r = range(task['start'], task['stop'], task['step'])
+```
+
+---
+class: left
+.right-section[
+### \#3 Parallelize
+]
+
+## For bruteforcing we need to write a separate function. It will accept range as an argument and iterate until done.
+```python
+def bruteforceRange(r):
+    for appid in r:
+        url = 'http://store.steampowered.com/app/' + str(appid)
+        print(url)
+```
+
+## Now lets run this function with task range
+```python
+...
+    if 'start' in task and 'stop' in task and 'step' in task:
+        r = range(task['start'], task['stop'], task['step'])
+        bruteforceRange(r)
+...
+```
+
+```shell
+$ python3 client.py 
+http://store.steampowered.com/app/0
+http://store.steampowered.com/app/10
+http://store.steampowered.com/app/20
+http://store.steampowered.com/app/30
+http://store.steampowered.com/app/40
+http://store.steampowered.com/app/50
+http://store.steampowered.com/app/60
+http://store.steampowered.com/app/70
+http://store.steampowered.com/app/80
+http://store.steampowered.com/app/90
+
+```
+---
+class: left
+.right-section[
+### \#3 Parallelize
+]
+
+## Now we can parse links
+```python
+def bruteforceRange(r):
+    games = []
+    for appid in r:
+        url = 'http://store.steampowered.com/app/' + str(appid)
+        data = get(url)
+        if data['ok']:
+            if data['URLMatch']:
+                precook = prepare(data['data'])
+                if precook:
+                    dish = cook(precook)
+                    games.append(dish)
+                    print(dish)
+    return games
+
+```
+
+```shell
+$ python3 client.py 
+Doing http://store.steampowered.com/app/10
+{'rating': {'count': '10', 'total': '48631'}, ...
+
+Doing http://store.steampowered.com/app/20
+{'rating': {'count': '9', 'total': '1800'}, 'tags':...
+
+Doing http://store.steampowered.com/app/30
+{'rating': {'count': '9', 'total': '1610'},...
+
+```
+
+---
+class: left
+.right-section[
+### \#3 Parallelize
+]
+## Add some requests description
+```python
+def bruteforceRange(r):
+    games = []
+    for appid in r:
+        url = 'http://store.steampowered.com/app/' + str(appid)
+        data = get(url)
+        if data['ok']:
+            if data['URLMatch']:
+                precook = prepare(data['data'])
+                if precook:
+                    print('Doing', url)
+                    dish = cook(precook)
+                    games.append(dish)
+                else:
+                    print('Skipping', url)
+            else:
+                print('Skipping', url)
+        else:
+            print('Skipping', url)
+
+    return games
+```
+
+---
+class: left
+.right-section[
+### \#3 Parallelize
+]
+
+## Lets print the results
+```python
+...
+    if 'start' in task and 'stop' in task and 'step' in task:
+        r = range(task['start'], task['stop'], task['step'])
+        print(bruteforceRange(r))
+...
+```
+
+```shell
+$ py client.py 
+Skipping http://store.steampowered.com/app/0
+Doing http://store.steampowered.com/app/10
+Doing http://store.steampowered.com/app/20
+Doing http://store.steampow...
+...
+[{'tags': ['Action', 'FPS', 'Multiplayer', 'Classic', 'Shooter', 'Team-Based',
+ 'Competitive', 'First-Person', 'Tactical', "1990's", 'e-sports', 'PvP', 
+ 'Strategy', 'Military', '1980s', 'Score Attack', 'Survival', 'Assassin',
+  'Ninja', 'Tower Defense'], 'appid': 0, 'name': 'Counter-Strike', 'price': 
+  '11.99', 'currency': ['NZ$'], 'rating': {'total'...
+```
+
+---
+class: left
+.right-section[
+### \#3 Parallelize
+]
+
+## Now we need to post result back to server. To do that we need to write *POST* maker for *client*, and *POST* processor for *server*.
+## Client post function is pretty much a copy of GET. Except we need to add `body` to arguments and encode it in request
+
+```python
+def post(url, values):
+    try:
+        headers = {
+          'User-Agent' : 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/44.0.2403.89 Chrome/44.0.2403.89 Safari/537.36'
+        }
+
+        data = parse.urlencode(values)
+        data = data.encode('utf-8')
+
+        req = request.Request(url, data, headers=headers)
+        resp = request.urlopen(req, timeout=2)
+        
+        return { 
+            'ok': True,
+            'URLMatch': url == resp.url,
+            'data': resp.read().decode('utf-8')
+        }
+    except Exception as e:
+        return { 'ok': False, 'error': str(e)}
+```
+---
+class: left
+.right-section[
+### \#3 Parallelize
+]
+## Same as we did *GET* request handling with `do_GET()`, we can handle *POST* with `do_POST()`
+```python
+class HTTPProcessor(BaseHTTPRequestHandler):
+    def do_GET(self):
+    ....
+
+    def do_POST(self):
+        self.send_response(200)
+        self.send_header('content-type','application/json')
+        self.end_headers()
+
+        ip = self.client_address[0]
+```
+
+---
+class: left
+.right-section[
+### \#3 Parallelize
+]
+## To parse *POST* we need to use `cgi` library
+```python
+        import cgi
+        ...
+        form = cgi.FieldStorage(
+            fp      = self.rfile, 
+            headers = self.headers,
+            environ = {
+                'REQUEST_METHOD' : 'POST',
+                'CONTENT_TYPE'   : self.headers['Content-Type'],
+            }
+        )
+```
+
+## Lets print request
+```python
+        print('Getting post request from', ip, form)
+```
+
+---
+class: left
+.right-section[
+### \#3 Parallelize
+]
+
+## Testing request
+```python
+post('http://localhost:8888/', {'username': 'bob'}) #client.py
+```
+
+```shell
+$ python3 client.py
+```
+
+```shell
+$ python3 server.py
+127.0.0.1 - - [04/Sep/2015 06:54:52] "POST / HTTP/1.1" 200 -
+Getting post request from 127.0.0.1 FieldStorage(None, None, [MiniFieldStorage('username', 'bob')])
+```
+
+---
+class: left
+.right-section[
+### \#3 Parallelize
+]
+
+## When client finish brute-forcing, it will JSON encode data and *POST* it server with *method* *data*
+```python
+    ...
+    if 'start' in task and 'stop' in task and 'step' in task:
+        r = range(task['start'], task['stop'], task['step'])
+        data = bruteforceRange(r)
+        post('http://localhost:8888/', {'method': 'data', 'data': json.dumps(data)})
+```
+
+## Server checks if method is defined, and if data is provided 
+
+```python
+        ...
+        form = cgi.FieldStorage(
+            fp      = self.rfile, 
+            headers = self.headers,
+            environ = {
+                'REQUEST_METHOD' : 'POST',
+                'CONTENT_TYPE'   : self.headers['Content-Type'],
+            }
+        )
+
+        if 'method' in form:
+            if form['method'].value == 'data':
+                if 'data' in form:
+                    data = form['data'].value
+                
+                else:
+                    print('No data')
+        ...
+```
+
+---
+class: left
+.right-section[
+### \#3 Parallelize
+]
+
+## And then we try to parse JSON response, if OK we will complete task, else fail.
+```python
+    ...
+    if 'method' in form:
+        if form['method'].value == 'data':
+            if 'data' in form:
+                rawData = form['data'].value
+                try:
+                    data = json.loads(rawData)
+                    manager.completeTask(ip, data)
+                    print('Success data')
+                except Exception as e:
+                    print(e)
+                    manager.failTask(ip)
+                    print('Failed data')
+            else:
+                    print('No data')
+```
+---
+class: left
+.right-section[
+### \#3 Parallelize
+]
+
+## Lets remove annoying console logs by redefining `log_message` method in *HTTPProcessor* class
+```python
+
+class HTTPProcessor(BaseHTTPRequestHandler):
+    def do_GET(self):
+        ...
+    def do_POST(self):
+        ...
+    def log_message(self, format, *args):
+        return
+```
+
+---
+class: left
+.right-section[
+### \#3 Parallelize
+]
+
+## Lastly we need to add task generator:
+```python
+was = 0
+step = 10
+for i in range(2500, 1000000, 2500):
+    id = str(was) + '-' + str(i)
+    manager.addTask(id, range(was, i, step))
+    was = i
+
+address = ( '0.0.0.0', 8888 )
+...
+```
+
+---
+class: left
+.right-section[
+### \#3 Parallelize
+]
+
+## And lets add infinite loop for the client and move start code to the separate function
+
+```python
+def StartClient():
+    mothership = 'http://localhost:8888/'
+    print('Starting client...')
+    while True:
+        task = ''
+        try:
+            task = get(mothership)
+        except:
+            print('Server is down')
+            sleep(1)
+            continue
+
+        if task['ok']:
+            todo = json.loads(task['data'])
+            if 'start' in todo and 'stop' in todo and 'step' in todo:
+                print('Received task:', todo['start'], 'to', todo['stop'], 'step', todo['step'] )
+                r = range(todo['start'], todo['stop'], todo['step'])
+ 
+                data = bruteforceRange(r)
+                post(mothership, {'method': 'data', 'data' : json.dumps(data)})
+            else:
+                print('Not task')
+                sleep(1)
+        else:
+            print('Failed to receive task')
+        sleep(1)
+
+StartClient()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+# This section was proudly sponsored by *French music*
+
+<iframe width="100%" height="50%" src="https://www.youtube.com/embed/zfjm0K1l7AM" frameborder="0" allowfullscreen></iframe>
+
+# French music, what a great way to show how romantic your code is...
+
+---
+# \#4 Q/A and Bonus
+
+---
+![WE DO IT LIVE](images/we.do.it.live.gif)
+---
+
+# The end
+
+---
+
+![Been a pleasure to know ya'll](images/preasure.to.know.yall.gif)
+
+---
+
+## Any grammar, bugs, improvements, please submit pull request
+## [https://github.com/herrniemand/KiwiPycon2015](https://github.com/herrniemand/KiwiPycon2015)
+
+---
+
+## Any love/hate messages, and comments please email me
+## [ackermann.yuriy@gmail.com](mailto:ackermann.yuriy@gmail.com)
+
+## You can encrypt it with my public key
+## [https://keybase.io/niemand/key.asc](https://keybase.io/niemand/key.asc)
+
+---
+
+## Any Best-friends/Face-punching offers
+## Please meet at the pub tonight.
