@@ -1,9 +1,5 @@
-import re, json
 from bs4 import BeautifulSoup
-
-# http://store.steampowered.com/app/220/ # Price
-# http://store.steampowered.com/app/7340 # No price
-# http://store.steampowered.com/app/6370 # Free to play
+import re
 
 def clean( content, form ):
     expressions = {
@@ -13,86 +9,62 @@ def clean( content, form ):
     regex = re.compile(expressions[form])
     return regex.sub('', content)
 
-def toInt( num ):
-    try:
-        return int(num)
-    except:
-        try:
-            return float(num)
-        except:
-            print(num)
-            return 0
+def prepare( data ):
+    soup  = BeautifulSoup(data, 'html.parser')
+    if not 'Site Error' in soup.find('title').text:
+        game = {
+            'appid'    : 0,
+            'name'     : soup.find('div', {'class': 'apphub_AppName'}),
+            'price'    : soup.find('div', {'class': 'game_purchase_price price'}),
+            'currency' : soup.find('div', {'class': 'game_purchase_price price'}),
+            'tags'     : soup.find_all('a', {'class': 'app_tag'}),
+            'rating'   : {
+                'count' : soup.find('meta', { 'itemprop' : 'ratingValue' }),
+                'total' : soup.find('meta', { 'itemprop' : 'reviewCount' })
+            }
+        }
+        return game
 
 def cook( data ):
-    def name( d ):
-        if d != None:
-            return clean(d.text, 'tabs')
+    def name( item ):
+        if item != None:
+            return clean(item.text, 'tabs')
+        else:
+            return ''
 
-    def price( d ):
-        if d != None:
-            d = d.text
-
-            if 'Free to Play' in d:
-                return 0
-            elif d == '':
-                return 0
-                
-            return toInt(clean(d, 'numbers'))
-        return 0
-
-    def currency( d ):
-        if d != None:
-            d = d.text
-            if 'Free to Play' in d:
-                return ''
-            elif d == '':
-                return ''
-                
-            return lax(re.findall(r'[A-Za-z]*[$¢£¤¥֏؋৲৳৻૱௹฿៛€]', d), 0)
-        return ''
-
-    def rating( d ):
-        for var in d:
-            if d[var] != None:
-                d[var] = int(d[var]['content'])
+    def price( item ):
+        if item != None:
+            if 'Free to play' in item.text:
+                return 0.0
             else:
-                d[var] = 0
-        return d
+                return clean(item.text, 'numbers')
+        else:
+            return 0.0
 
-    return {
-        'name'     : name(data['name']),
-        'price'    : price(data['price']),
-        'currency' : currency(data['price']),
-        'tags'     : data['tags'],
-        'rating'   : rating(data['rating'])
+    def currency( item ):
+        if item != None:
+            if 'Free to play' in item.text:
+                return ''
+            else:
+                return re.findall(r'[A-Za-z]*[$¢£¤¥֏؋৲৳৻૱௹฿៛€]', item.text)
+        else:
+            return ''
+
+    def rating( item ):
+        if item != None:
+            return item['content']
+        else:
+            return 0
+
+    game = {
+        'appid'     : data['appid'],
+        'name'      : name(data['name']),
+        'price'     : price(data['price']),
+        'currency'  : currency(data['currency']),
+        'tags'      : [ clean(tag.text, 'tabs') for tag in data['tags'] ],
+        'rating'    : {
+            'total' : rating(data['rating']['total']),
+            'count' : rating(data['rating']['count'])
+        }
     }
-
-
-def prepare( content ):
-    soup = BeautifulSoup(content, 'html.parser')
-    title = soup.find('title').text
-    if title != 'Site Error':
-        game = {}
-
-        try:
-            game = {
-                'name'        : soup.find('div', { 'class' : 'apphub_AppName' }),
-                'price'       : soup.find('div', { 'class' : 'game_purchase_price price' }),
-                'tags'        : [ clean(tag.text, 'tabs') for tag in soup.find_all('a', {'class' : 'app_tag'}) ],
-                'rating'      : {
-                    'count' : soup.find(attrs={ 'itemprop' : 'reviewCount'}),
-                    'total' : soup.find(attrs={ 'itemprop' : 'ratingValue'})
-                }
-            }
-        except Exception as e:
-            print(json.dumps({
-                'Error': str(e)
-            }, indent=4, separators=(',', ': ')))
-
-            return {'ok': False}
-
-        export = cook(game)
-
-        return {'ok': True, 'data' : export}
-    else:
-        return {'ok': False}
+    return game

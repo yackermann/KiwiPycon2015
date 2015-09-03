@@ -7,15 +7,17 @@ token = os.getenv('DO_API_TOKEN', '')
 #Getting DO manager
 man = do.Manager(token=token)
 
+# Pool Prefix
 prefix = 'zergling'
+
 #Creating pool of vms
-def createPool(quantity=40, region='sfo1'):
+def createPool(quantity=47, region='sfo1'):
     for i in range( 0, quantity ):
         name = prefix + '.' + region + '.' + str(i)
         droplet = do.Droplet(token = token,
                              name  = name,
-                             region = region, # San Francisco 1
-                             image = 13232378,
+                             region = region, # def San Francisco 1
+                             image = 13236931,
                              size_slug = '512mb', # Cheapest option
                              private_networking = True)
         droplet.create()

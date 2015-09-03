@@ -16,12 +16,6 @@ class Task:
     def addData(self, data):
         """Assets Task data value"""
         self.data = data
-        self.cache()
-
-    def cache(self):
-        """Caches Task data"""
-        with open('cache/' + str(self.id) + '.json', 'w') as cache:
-            cache.write(json.dumps(self.data, indent=4, separators=(',', ': ')))
 
     def getData(self):
         """Returns Tasks data"""
@@ -84,9 +78,14 @@ class TaskList:
         """Fails Task, specified by ip address"""
         if ip in self.running:
             task = self.running[ip]
-            lastTask = self.new.pop()
-            self.new.append(task)
-            self.new.append(lastTask)
+
+            if len(self.new) > 0:
+                lastTask = self.new.pop()
+                self.new.append(task)
+                self.new.append(lastTask)
+            else:
+                self.new.append(task)
+           
             del self.running[ip]
 
     def exportData(self):
