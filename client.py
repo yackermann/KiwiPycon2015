@@ -8,6 +8,9 @@ headers = {
     'User-Agent' : 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/44.0.2403.89 Chrome/44.0.2403.89 Safari/537.36'
 }
 
+mothership = 'http://192.241.194.12:8888/'
+
+
 def get(url):
     try:
         req = request.Request(url, headers=headers)
@@ -59,7 +62,6 @@ def bruteforceRange(r):
     return games
 
 def StartClient():
-    mothership = 'http://192.241.194.12:8888/'
     print('Starting client...')
     while True:
         task = ''
