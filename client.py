@@ -40,8 +40,7 @@ def post(url, values):
 def bruteforceRange(r):
     games = []
     for appid in r:
-        # url = 'http://store.steampowered.com/app/' + str(appid)
-        url = 'http://localhost:3456/' + str(appid) + '.html'
+        url = 'http://store.steampowered.com/app/' + str(appid)
         data = get(url)
         if data['ok']:
             if data['URLMatch']:
@@ -60,7 +59,7 @@ def bruteforceRange(r):
     return games
 
 def StartClient():
-    mothership = 'http://localhost:8888/'
+    mothership = 'http://192.241.194.12:8888/'
     print('Starting client...')
     while True:
         task = ''

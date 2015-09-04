@@ -51,7 +51,12 @@ class HTTPProcessor(BaseHTTPRequestHandler):
 
         print('Getting post request from', ip, form)
 
-
+was = 0
+step = 10
+for i in range(2500, 1000000, 2500):
+    id = str(was) + '-' + str(i)
+    manager.addTask(id, range(was, i, step))
+    was = i
 
 address = ( '0.0.0.0', 8888 )
 

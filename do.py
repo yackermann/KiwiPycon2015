@@ -37,3 +37,12 @@ def destroyPool(region='sfo1'):
                 print('Destroying: ' + droplet.name)
             except:
                 print('Can not destroy', droplet.name, 'Busy!')
+
+def restartPool(region='sfo1'):
+    for droplet in man.get_all_droplets():
+        if prefix + '.' + region in droplet.name:
+            try:
+                droplet.reboot()
+                print('restarting: ' + droplet.name)
+            except:
+                print('Can not destroy', droplet.name, 'Busy!')
