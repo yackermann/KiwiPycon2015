@@ -51,6 +51,8 @@ class HTTPProcessor(BaseHTTPRequestHandler):
 
         print('Getting post request from', ip, form)
 
+    def log_message(self, format, *args):
+        return
 was = 0
 step = 10
 for i in range(2500, 1000000, 2500):
