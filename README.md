@@ -11,7 +11,7 @@ sudo apt-get install python
 
 Install pip3
 ```bash
-sudo apt-get install python3-pip
+sudo apt-get install python-pip
 ```
 
 Install BeautifulSoup4
@@ -26,6 +26,6 @@ pip3 install python-digitalocean
 
 ## Run
 
-Start server `python3 serv.py`
+Start server `python3 server.py`
  
 Start client `python3 client.py`
