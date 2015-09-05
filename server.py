@@ -18,7 +18,7 @@ class HTTPProcessor(BaseHTTPRequestHandler):
         if not timestamp:
             timestamp = time.perf_counter()
 
-        if len(manager.new) && len(manager.running):
+        if len(manager.new) or len(manager.running):
             if self.path == '/':
                 print('\033c')
                 print('Tasks running:',  len(manager.running))
