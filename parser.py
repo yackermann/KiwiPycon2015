@@ -61,11 +61,13 @@ def cook( data ):
             return 0
 
     def genre( item ):
+        genres = []
         if item != None:
             for thing in item:
                 if 'Genre' in thing[0] and len(thing) == 2:
-                    return thing[1]
-        return ''
+                    genres.append(thing[1])
+            return genres
+        return []
 
     def publisher( item ):
         if item != None:
