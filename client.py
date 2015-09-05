@@ -10,7 +10,6 @@ headers = {
 
 mothership = 'http://192.241.194.12:8888/'
 
-
 def get(url):
     try:
         req = request.Request(url, headers=headers)
@@ -73,16 +72,19 @@ def StartClient():
             continue
 
         if task['ok']:
-            todo = json.loads(task['data'])
-            if 'start' in todo and 'stop' in todo and 'step' in todo:
-                print('Received task:', todo['start'], 'to', todo['stop'], 'step', todo['step'] )
-                r = range(todo['start'], todo['stop'], todo['step'])
- 
-                data = bruteforceRange(r)
-                post(mothership, {'method': 'data', 'data' : json.dumps(data)})
-            else:
-                print('Not task')
-                sleep(1)
+            try:
+                todo = json.loads(task['data'])
+                if 'start' in todo and 'stop' in todo and 'step' in todo:
+                    print('Received task:', todo['start'], 'to', todo['stop'], 'step', todo['step'] )
+                    r = range(todo['start'], todo['stop'], todo['step'])
+     
+                    data = bruteforceRange(r)
+                    post(mothership, {'method': 'data', 'data' : json.dumps(data)})
+                else:
+                    print('No task')
+                    sleep(1)
+            except:
+                print('No task')
         else:
             print('Failed to receive task')
         sleep(1)
