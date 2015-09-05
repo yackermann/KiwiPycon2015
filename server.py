@@ -1,23 +1,41 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from tasklist import *
-import cgi
+import cgi, time
 manager = TaskList()
 
-manager.addTask('test', range(0, 100, 10))
+timestamp = 0.0
+complete = False
 
 class HTTPProcessor(BaseHTTPRequestHandler):
     def do_GET(self):
+        global timestamp, complete
         self.send_response(200)
         self.send_header('content-type','application/json')
         self.end_headers()
 
         ip = self.client_address[0]
 
+        if not timestamp:
+            timestamp = time.perf_counter()
+
+        if len(manager.new):
+            if self.path == '/':
+                print('\033c')
+                print('Tasks running:',  len(manager.running))
+                print('Tasks complete:', len(manager.complete))
+                print('Tasks left:',     len(manager.new))
+
+                print('Getting task for', self.client_address[0])
+        else:
+            if not complete:
+                print('\033c')
+                print('Time taken', time.perf_counter() - timestamp)
+                print('Total tasks', len(manager.complete))
+                complete = True
+
         task = manager.getTask(ip)
         self.wfile.write(task.encode('utf-8'))
-    
-        print('Getting get request from', self.client_address)
-
+        
     def do_POST(self):
         self.send_response(200)
         self.send_header('content-type','application/json')
@@ -41,24 +59,26 @@ class HTTPProcessor(BaseHTTPRequestHandler):
                     try:
                         data = json.loads(rawData)
                         manager.completeTask(ip, data)
-                        print('Success data')
+                        print('Succeed data', ip)
                     except Exception as e:
                         print(e)
                         manager.failTask(ip)
-                        print('Failed data')
+                        print('Failed data', ip)
                 else:
-                    print('No data')  
-
-        print('Getting post request from', ip, form)
+                    print('No data', ip)  
 
     def log_message(self, format, *args):
         return
-was = 0
-step = 10
-for i in range(2500, 1000000, 2500):
-    id = str(was) + '-' + str(i)
-    manager.addTask(id, range(was, i, step))
-    was = i
+
+def generateTasks():
+    was = 0
+    step = 10
+    for i in range(2500, 1000000, 2500):
+        id = str(was) + '-' + str(i)
+        manager.addTask(id, range(was, i, step))
+        was = i
+
+generateTasks()
 
 address = ( '0.0.0.0', 8888 )
 
