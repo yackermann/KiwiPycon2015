@@ -29,3 +29,13 @@ pip3 install python-digitalocean
 Start server `python3 server.py`
  
 Start client `python3 client.py`
+
+---
+
+Copyright (c) 2015 Ackermann Yuriy and contributors.
+
+Special thanks to [RmACK123](https://github.com/RmACK123) for his solution.
+
+### Licenses: 
+* Code: The MIT License (MIT)
+* Slides: CC4 ShareAlike
