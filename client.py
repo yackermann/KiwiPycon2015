@@ -4,12 +4,15 @@ from parser import *
 import json
 from time import sleep
 
+# Servers address
+mothership = 'http://192.241.194.12:8888/'
+
+# HEADERS
 headers = {
     'User-Agent' : 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/44.0.2403.89 Chrome/44.0.2403.89 Safari/537.36'
 }
 
-mothership = 'http://192.241.194.12:8888/'
-
+# GET request function
 def get(url):
     try:
         req = request.Request(url, headers=headers)
@@ -23,6 +26,7 @@ def get(url):
     except Exception as e:
         return { 'ok': False, 'error': str(e)}
 
+# POST request function
 def post(url, values):
     try:
         data = parse.urlencode(values)
@@ -39,6 +43,7 @@ def post(url, values):
     except Exception as e:
         return { 'ok': False, 'error': str(e)}
 
+# Range bruteforce
 def bruteforceRange(r):
     games = []
     for appid in r:
