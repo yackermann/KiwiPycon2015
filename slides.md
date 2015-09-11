@@ -2783,3 +2783,8 @@ StartClient()
 
 ## Any Best-friends/Face-punching offers
 ## Please meet at the pub tonight.
+
+---
+
+# License
+## [Creative-Commons 4.0 ShareALike](LICENSE.md)
